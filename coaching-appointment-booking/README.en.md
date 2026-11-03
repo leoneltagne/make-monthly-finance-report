@@ -18,6 +18,16 @@ A practical case study: a coach sells online coaching sessions (YouTube, TikTok,
    - generates 9 candidate slots (next 3 working days at 10:00, 14:00 and 16:00), checks each one in the calendar and keeps only the free ones;
    - emails those slots to the client, and an alert to the coach.
 
+## 24-hour reminder
+
+A second scenario, [`reminder-blueprint.json`](reminder-blueprint.json), runs **every day at 09:00**:
+
+1. It looks in the `Suivi de rendez-vous` tab for rows with status `Confirmé` whose date is tomorrow (column D, `YYYY-MM-DD` format).
+2. It emails each client a reminder: time, duration, goal, and how to move or cancel.
+3. It sets the row to status `Rappel envoyé`, so a client never receives two reminders.
+
+If there is no session tomorrow it uses a single operation. To import it, follow the same setup steps below, replacing `YOUR_SPREADSHEET_ID` and the connections.
+
 ## Prerequisites
 
 - A **Youform** form with these fields, named exactly: `Prénom et nom`, `Adresse e-mail`, `Téléphone`, `Date souhaitée`, `Heure souhaitée`, `Durée` (values like `30 min`), `Objectif de la séance`, `Où nous avez-vous découvert ?`, and a consent checkbox. Youform's **Webhook** integration must be enabled.
@@ -46,9 +56,11 @@ A practical case study: a coach sells online coaching sessions (YouTube, TikTok,
 - Public holidays are not excluded unless they are in the checked calendar.
 - The duration computation assumes the `30 min` format (a number followed by a space).
 - The consent checkbox is not checked by the scenario.
-- I could not read the content of the sent emails through Make's API: the "free slot" branch was checked by hand in the calendar, the Sheet and the inbox. The new slot-proposal branch ran successfully (39 operations), but the content of the generated email still needs a manual check.
+- I could not read the content of the sent emails through Make's API, which only returns execution statuses. Emails, calendar and Sheet were therefore checked by hand: "free slot" branch, "slot taken" branch (39 operations, the busy slot absent from the proposals) and the 24 h reminder (3 operations).
+- Make's free plan limits the number of active scenarios: the three scenarios in this repository, active together, reach that limit.
 - Make's Gmail connection expires after about six months and must be re-authorized.
 
 ## Files
 
-- [`blueprint.json`](blueprint.json): the scenario, ready to import, with no personal identifiers.
+- [`blueprint.json`](blueprint.json): the booking scenario, ready to import, with no personal identifiers.
+- [`reminder-blueprint.json`](reminder-blueprint.json): the 24 h reminder scenario, same principle.

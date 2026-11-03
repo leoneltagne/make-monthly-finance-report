@@ -18,6 +18,16 @@ Cas pratique : un entrepreneur vend des séances de coaching en ligne (YouTube, 
    - génère 9 créneaux candidats (3 jours ouvrés à venir, à 10h, 14h et 16h), vérifie chacun dans l'agenda et ne garde que les libres ;
    - envoie ces créneaux au client dans un e-mail, et une alerte à l'entrepreneur.
 
+## Rappel 24 h avant la séance
+
+Un second scénario, [`reminder-blueprint.json`](reminder-blueprint.json), tourne **chaque jour à 09:00** :
+
+1. Il cherche dans l'onglet `Suivi de rendez-vous` les lignes au statut `Confirmé` dont la date est celle de demain (colonne D, format `AAAA-MM-JJ`).
+2. Il envoie à chaque client un e-mail de rappel : heure, durée, objectif, et consigne pour déplacer ou annuler.
+3. Il passe la ligne au statut `Rappel envoyé`, pour qu'un client ne reçoive jamais deux rappels.
+
+S'il n'y a aucune séance demain, il ne consomme qu'une opération. Pour l'importer, suivez les mêmes étapes de mise en place que ci-dessous, en remplaçant `YOUR_SPREADSHEET_ID` et les connexions.
+
 ## Prérequis
 
 - Un formulaire **Youform** avec ces champs, nommés exactement : `Prénom et nom`, `Adresse e-mail`, `Téléphone`, `Date souhaitée`, `Heure souhaitée`, `Durée` (valeurs du type `30 min`), `Objectif de la séance`, `Où nous avez-vous découvert ?`, et une case de consentement. L'intégration **Webhook** de Youform doit être activée.
@@ -46,9 +56,11 @@ Cas pratique : un entrepreneur vend des séances de coaching en ligne (YouTube, 
 - Les jours fériés ne sont pas exclus, sauf s'ils sont dans l'agenda vérifié.
 - Le calcul de la durée suppose le format `30 min` (nombre suivi d'un espace).
 - La case de consentement n'est pas contrôlée par le scénario.
-- Je n'ai pas pu lire le contenu des e-mails envoyés depuis l'API de Make : la branche « créneau libre » a été vérifiée à la main dans l'agenda, le Sheet et la boîte e-mail. La nouvelle branche de proposition de créneaux a tourné avec succès (39 opérations), mais le contenu de l'e-mail généré reste à vérifier à la main.
+- Je n'ai pas pu lire le contenu des e-mails envoyés depuis l'API de Make, qui ne renvoie que le statut des exécutions. Les e-mails, l'agenda et le Sheet ont donc été contrôlés à la main : branche « créneau libre », branche « créneau pris » (39 opérations, créneau occupé absent des propositions) et rappel 24 h (3 opérations).
+- Le plan gratuit de Make limite le nombre de scénarios actifs : les trois scénarios de ce dépôt actifs en même temps atteignent la limite.
 - La connexion Gmail de Make expire après environ six mois et doit être réautorisée.
 
 ## Fichiers
 
-- [`blueprint.json`](blueprint.json) : le scénario, prêt à importer, sans identifiant personnel.
+- [`blueprint.json`](blueprint.json) : le scénario de prise de rendez-vous, prêt à importer, sans identifiant personnel.
+- [`reminder-blueprint.json`](reminder-blueprint.json) : le scénario de rappel 24 h, même principe.
