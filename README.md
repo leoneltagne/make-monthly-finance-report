@@ -46,3 +46,7 @@ Les totaux sont calculés directement dans le corps de l'e-mail :
 ## Fichiers
 
 - [`blueprint.json`](blueprint.json) : le scénario, prêt à importer, sans identifiant personnel.
+
+## Autres cas pratiques
+
+- [`coaching-appointment-booking/`](coaching-appointment-booking/README.md) : prise de rendez-vous de coaching avec Youform, Google Agenda, Google Sheets et Gmail, avec proposition de créneaux libres.

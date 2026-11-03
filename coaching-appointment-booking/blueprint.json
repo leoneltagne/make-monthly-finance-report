@@ -1,0 +1,256 @@
+{
+  "name": "Prise de rendez-vous coaching",
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": true,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    }
+  },
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": { "hook": 0, "maxResults": 1 },
+      "mapper": {}
+    },
+    {
+      "id": 2,
+      "module": "util:SetVariable2",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "name": "start",
+        "value": "{{1.answers.`Date souhaitée`}}T{{1.answers.`Heure souhaitée`}}:00"
+      }
+    },
+    {
+      "id": 3,
+      "module": "util:SetVariable2",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "name": "end",
+        "value": "{{formatDate(addMinutes(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); first(split(1.answers.`Durée`; \" \"))); \"YYYY-MM-DDTHH:mm:ss\")}}"
+      }
+    },
+    {
+      "id": 4,
+      "module": "google-calendar:ActionGetEvents",
+      "version": 4,
+      "parameters": { "account": 0, "continueWhenNoRes": true },
+      "mapper": {
+        "calendarId": "YOUR_CALENDAR_ID",
+        "timeMin": "{{2.start}}",
+        "timeMax": "{{3.end}}",
+        "singleEvents": true,
+        "maxResults": 1
+      }
+    },
+    {
+      "id": 5,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "mapper": null,
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 6,
+              "module": "google-calendar:ActionCreateEvent",
+              "version": 4,
+              "filter": {
+                "name": "Créneau libre",
+                "conditions": [[{ "a": "{{4.id}}", "o": "notexist" }]]
+              },
+              "parameters": { "account": 0 },
+              "mapper": {
+                "calendarId": "YOUR_CALENDAR_ID",
+                "summary": "Coaching - {{1.answers.`Prénom et nom`}}",
+                "description": "Objectif : {{1.answers.`Objectif de la séance`}}\nE-mail : {{1.answers.`Adresse e-mail`}}\nTéléphone : {{1.answers.`Téléphone`}}\nSource : {{1.answers.`Où nous avez-vous découvert ?`}}",
+                "allDayEvent": false,
+                "start": "{{2.start}}",
+                "end": "{{3.end}}",
+                "sendNotifications": false,
+                "transparency": "opaque",
+                "visibility": "default",
+                "guestsCanModify": false
+              }
+            },
+            {
+              "id": 7,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "parameters": { "__IMTCONN__": 0 },
+              "mapper": {
+                "mode": "select",
+                "from": "drive",
+                "spreadsheetId": "YOUR_SPREADSHEET_ID",
+                "sheetId": "Suivi de rendez-vous",
+                "includesHeaders": true,
+                "useColumnHeaders": false,
+                "insertUnformatted": false,
+                "valueInputOption": "RAW",
+                "values": {
+                  "0": "{{1.answers.`Prénom et nom`}}",
+                  "1": "{{1.answers.`Adresse e-mail`}}",
+                  "2": "{{1.answers.`Téléphone`}}",
+                  "3": "{{1.answers.`Date souhaitée`}}",
+                  "4": "{{1.answers.`Heure souhaitée`}}",
+                  "5": "{{first(split(1.answers.`Durée`; \" \"))}}",
+                  "6": "{{1.answers.`Objectif de la séance`}}",
+                  "7": "{{1.answers.`Où nous avez-vous découvert ?`}}",
+                  "8": "Confirmé",
+                  "9": "{{6.id}}"
+                }
+              }
+            },
+            {
+              "id": 8,
+              "module": "google-email:sendAnEmail",
+              "version": 4,
+              "parameters": { "__IMTCONN__": 0 },
+              "mapper": {
+                "to": ["{{1.answers.`Adresse e-mail`}}"],
+                "subject": "Confirmation de votre séance de coaching du {{formatDate(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); \"DD/MM/YYYY\")}}",
+                "bodyType": "rawHtml",
+                "content": "<p>Bonjour {{1.answers.`Prénom et nom`}},</p><p>Votre rendez-vous de coaching est <b>confirmé</b> :</p><ul><li><b>Date :</b> {{formatDate(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); \"DD/MM/YYYY\")}}</li><li><b>Heure :</b> {{formatDate(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); \"HH:mm\")}}</li><li><b>Durée :</b> {{1.answers.`Durée`}}</li><li><b>Objectif :</b> {{1.answers.`Objectif de la séance`}}</li></ul><p>Pour modifier ou annuler, répondez simplement à cet e-mail.</p><p>À très bientôt !</p>"
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 9,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "filter": {
+                "name": "Créneau déjà pris",
+                "conditions": [[{ "a": "{{4.id}}", "o": "exist" }]]
+              },
+              "parameters": { "__IMTCONN__": 0 },
+              "mapper": {
+                "mode": "select",
+                "from": "drive",
+                "spreadsheetId": "YOUR_SPREADSHEET_ID",
+                "sheetId": "Suivi de rendez-vous",
+                "includesHeaders": true,
+                "useColumnHeaders": false,
+                "insertUnformatted": false,
+                "valueInputOption": "RAW",
+                "values": {
+                  "0": "{{1.answers.`Prénom et nom`}}",
+                  "1": "{{1.answers.`Adresse e-mail`}}",
+                  "2": "{{1.answers.`Téléphone`}}",
+                  "3": "{{1.answers.`Date souhaitée`}}",
+                  "4": "{{1.answers.`Heure souhaitée`}}",
+                  "5": "{{first(split(1.answers.`Durée`; \" \"))}}",
+                  "6": "{{1.answers.`Objectif de la séance`}}",
+                  "7": "{{1.answers.`Où nous avez-vous découvert ?`}}",
+                  "8": "À replanifier",
+                  "9": ""
+                }
+              }
+            },
+            {
+              "id": 12,
+              "module": "builtin:BasicFeeder",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "array": "{{split(switch(parseNumber(formatDate(now; \"d\"; \"Europe/Paris\")); 0; \"1,2,3\"; 1; \"1,2,3\"; 2; \"1,2,3\"; 3; \"1,2,5\"; 4; \"1,4,5\"; 5; \"3,4,5\"; 6; \"2,3,4\"); \",\")}}"
+              }
+            },
+            {
+              "id": 13,
+              "module": "builtin:BasicFeeder",
+              "version": 1,
+              "parameters": {},
+              "mapper": { "array": "{{split(\"10,14,16\"; \",\")}}" }
+            },
+            {
+              "id": 14,
+              "module": "util:SetVariable2",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "name": "slotStart",
+                "value": "{{formatDate(addDays(now; 12.value); \"YYYY-MM-DD\"; \"Europe/Paris\")}}T{{13.value}}:00:00"
+              }
+            },
+            {
+              "id": 15,
+              "module": "util:SetVariable2",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "name": "slotEnd",
+                "value": "{{formatDate(addMinutes(parseDate(14.slotStart; \"YYYY-MM-DDTHH:mm:ss\"); first(split(1.answers.`Durée`; \" \"))); \"YYYY-MM-DDTHH:mm:ss\")}}"
+              }
+            },
+            {
+              "id": 16,
+              "module": "google-calendar:ActionGetEvents",
+              "version": 4,
+              "parameters": { "account": 0, "continueWhenNoRes": true },
+              "mapper": {
+                "calendarId": "YOUR_CALENDAR_ID",
+                "timeMin": "{{14.slotStart}}",
+                "timeMax": "{{15.slotEnd}}",
+                "singleEvents": true,
+                "maxResults": 1
+              }
+            },
+            {
+              "id": 17,
+              "module": "util:TextAggregator",
+              "version": 1,
+              "filter": {
+                "name": "Créneau candidat libre",
+                "conditions": [[{ "a": "{{16.id}}", "o": "notexist" }]]
+              },
+              "parameters": { "feeder": 12, "rowSeparator": "\n" },
+              "mapper": {
+                "value": "<li>{{formatDate(parseDate(14.slotStart; \"YYYY-MM-DDTHH:mm:ss\"); \"DD/MM/YYYY\")}} à {{13.value}}h00</li>"
+              }
+            },
+            {
+              "id": 10,
+              "module": "google-email:sendAnEmail",
+              "version": 4,
+              "parameters": { "__IMTCONN__": 0 },
+              "mapper": {
+                "to": ["{{1.answers.`Adresse e-mail`}}"],
+                "subject": "Votre demande de rendez-vous : voici d'autres créneaux disponibles",
+                "bodyType": "rawHtml",
+                "content": "<p>Bonjour {{1.answers.`Prénom et nom`}},</p><p>Merci pour votre demande. Le créneau du {{formatDate(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); \"DD/MM/YYYY\")}} à {{formatDate(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); \"HH:mm\")}} n'est malheureusement plus disponible.</p><p>Voici les créneaux libres des prochains jours :</p><ul>{{if(17.text; 17.text; \"<li>Aucun créneau libre sur les prochains jours, je reviens vers vous rapidement.</li>\")}}</ul><p>Répondez simplement à cet e-mail avec celui qui vous convient, et je le confirme.</p><p>À très bientôt !</p>"
+              }
+            },
+            {
+              "id": 11,
+              "module": "google-email:sendAnEmail",
+              "version": 4,
+              "parameters": { "__IMTCONN__": 0 },
+              "mapper": {
+                "to": ["YOUR_EMAIL"],
+                "subject": "À replanifier : {{1.answers.`Prénom et nom`}}",
+                "bodyType": "rawHtml",
+                "content": "<p>Un client a demandé un créneau déjà occupé :</p><ul><li><b>Client :</b> {{1.answers.`Prénom et nom`}} ({{1.answers.`Adresse e-mail`}}, {{1.answers.`Téléphone`}})</li><li><b>Créneau demandé :</b> {{formatDate(parseDate(2.start; \"YYYY-MM-DDTHH:mm:ss\"); \"DD/MM/YYYY HH:mm\")}} ({{1.answers.`Durée`}})</li><li><b>Objectif :</b> {{1.answers.`Objectif de la séance`}}</li></ul><p>Créneaux libres proposés au client :</p><ul>{{if(17.text; 17.text; \"<li>Aucun</li>\")}}</ul><p>La ligne est dans le Sheet avec le statut « À replanifier ».</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -46,3 +46,7 @@ The totals are computed directly in the email body:
 ## Files
 
 - [`blueprint.json`](blueprint.json): the scenario, ready to import, with no personal identifiers.
+
+## Other case studies
+
+- [`coaching-appointment-booking/`](coaching-appointment-booking/README.en.md): coaching appointment booking with Youform, Google Calendar, Google Sheets and Gmail, with free-slot proposals.
