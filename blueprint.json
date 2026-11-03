@@ -1,0 +1,65 @@
+{
+  "name": "Rapport financier mensuel",
+  "flow": [
+    {
+      "id": 6,
+      "module": "google-sheets:filterRows",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "from": "drive",
+        "sheetId": "Suivie charges",
+        "sortOrder": "asc",
+        "spreadsheetId": "YOUR_SPREADSHEET_ID",
+        "tableFirstRow": "A1:CZ1",
+        "includesHeaders": true,
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING"
+      }
+    },
+    {
+      "id": 12,
+      "module": "builtin:BasicAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 6
+      },
+      "mapper": {
+        "0": "{{6.`0`}}",
+        "1": "{{6.`1`}}",
+        "2": "{{6.`2`}}",
+        "3": "{{6.`3`}}",
+        "4": "{{6.`4`}}"
+      }
+    },
+    {
+      "id": 29,
+      "module": "email:ActionSendMeEmail",
+      "version": 7,
+      "parameters": {},
+      "mapper": {
+        "to": "YOUR_MAKE_ACCOUNT_EMAIL",
+        "subject": "Rapport financier mensuel - {{formatDate(now; \"MM/YYYY\"; \"Europe/Paris\")}}",
+        "html": "<p>Bonjour,</p><p>Voici le point financier issu du suivi des charges :</p><ul><li><b>Total facturé :</b> {{sum(map(12.array; \"1\"))}}</li><li><b>Total payé :</b> {{sum(map(12.array; \"1\"; \"2\"; \"Payé\"))}}</li><li><b>Total en attente :</b> {{sum(map(12.array; \"1\"; \"2\"; \"En attente\"))}}</li></ul><p>Rapport généré automatiquement par Make.</p>"
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "dlq": false,
+      "slots": null,
+      "dataloss": false,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "roundtrips": 1,
+      "sequential": false,
+      "confidential": false,
+      "freshVariables": false,
+      "autoCommitTriggerLast": true
+    }
+  }
+}
