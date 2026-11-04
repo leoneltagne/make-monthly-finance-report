@@ -50,3 +50,4 @@ The totals are computed directly in the email body:
 ## Other case studies
 
 - [`coaching-appointment-booking/`](coaching-appointment-booking/README.en.md): coaching appointment booking with Youform, Google Calendar, Google Sheets and Gmail, with free-slot proposals.
+- [`immobilier-lead-qualification/`](immobilier-lead-qualification/README.en.md): automatic triage and reply for a real-estate agency's inquiries with Youform, Claude, Google Sheets and Gmail, scored hot, warm or cold.

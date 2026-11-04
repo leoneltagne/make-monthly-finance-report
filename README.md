@@ -50,3 +50,4 @@ Les totaux sont calculés directement dans le corps de l'e-mail :
 ## Autres cas pratiques
 
 - [`coaching-appointment-booking/`](coaching-appointment-booking/README.md) : prise de rendez-vous de coaching avec Youform, Google Agenda, Google Sheets et Gmail, avec proposition de créneaux libres.
+- [`immobilier-lead-qualification/`](immobilier-lead-qualification/README.md) : tri et réponse automatique des demandes d'une agence immobilière avec Youform, Claude, Google Sheets et Gmail, avec un score chaud, tiède ou froid.
