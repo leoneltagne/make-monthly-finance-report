@@ -51,3 +51,4 @@ The totals are computed directly in the email body:
 
 - [`coaching-appointment-booking/`](coaching-appointment-booking/README.en.md): coaching appointment booking with Youform, Google Calendar, Google Sheets and Gmail, with free-slot proposals.
 - [`immobilier-lead-qualification/`](immobilier-lead-qualification/README.en.md): automatic triage and reply for a real-estate agency's inquiries with Youform, Claude, Google Sheets and Gmail, scored hot, warm or cold.
+- [`ecommerce-support-triage/`](ecommerce-support-triage/README.en.md): automatic triage of an online shop's customer messages with Youform, Claude, Google Sheets and Gmail, classified as tracking, return, product or dispute.
