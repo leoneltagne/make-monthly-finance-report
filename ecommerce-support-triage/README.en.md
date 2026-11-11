@@ -2,6 +2,8 @@
 
 [Version française](README.md)
 
+**[Watch the video demo (Loom)](https://www.loom.com/share/2d5e015c457c46ebb41b1e0922b9d6ba)** (in French)
+
 Fictional case study: an online shop selling handmade candles receives all its customer messages on a single address. A [Make](https://www.make.com) scenario has Claude read each message, classify it (order tracking, return, product question or dispute), rate its urgency and write a short summary. The request is logged in a Google Sheet, then a suitable reply or alert is sent automatically.
 
 The scenario was built step by step in Make, with Claude's help for the prompt, the formulas and error diagnosis. All test data is fictional.

@@ -2,6 +2,8 @@
 
 [English version](README.en.md)
 
+**[Voir la démo vidéo (Loom)](https://www.loom.com/share/2d5e015c457c46ebb41b1e0922b9d6ba)**
+
 Cas pratique fictif : une boutique en ligne de bougies artisanales reçoit tous ses messages clients sur une seule adresse. Un scénario [Make](https://www.make.com) fait lire chaque message par Claude, qui le classe (suivi, retour, question produit ou litige), évalue l'urgence et en tire un résumé. La demande est enregistrée dans un Google Sheet, puis une réponse ou une alerte adaptée part automatiquement.
 
 Le scénario a été construit pas à pas dans Make, avec l'aide de Claude pour le prompt, les formules et le diagnostic des erreurs. Toutes les données de test sont fictives.
