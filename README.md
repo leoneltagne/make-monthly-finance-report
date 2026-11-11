@@ -46,9 +46,3 @@ Les totaux sont calculés directement dans le corps de l'e-mail :
 ## Fichiers
 
 - [`blueprint.json`](blueprint.json) : le scénario, prêt à importer, sans identifiant personnel.
-
-## Autres cas pratiques
-
-- [`coaching-appointment-booking/`](coaching-appointment-booking/README.md) : prise de rendez-vous de coaching avec Youform, Google Agenda, Google Sheets et Gmail, avec proposition de créneaux libres.
-- [`immobilier-lead-qualification/`](immobilier-lead-qualification/README.md) : tri et réponse automatique des demandes d'une agence immobilière avec Youform, Claude, Google Sheets et Gmail, avec un score chaud, tiède ou froid.
-- [`ecommerce-support-triage/`](ecommerce-support-triage/README.md) : tri automatique des messages du service client d'une boutique en ligne avec Youform, Claude, Google Sheets et Gmail, classés suivi, retour, produit ou litige.
